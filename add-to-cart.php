@@ -64,11 +64,11 @@ if(
         ':quantity' => $quantity,
       ]);
     }
-    $_SESSION['add-to-cart'] = true;
+    $_SESSION['add-to-cart'] = TRUE;
     header("location:./movie-details.php?movie_id=$movie_id");
     exit;
   } else {
-    $_SESSION['add-to-cart'] = false;
+    $_SESSION['add-to-cart'] = FALSE;
     header("location:./movie-details.php?movie_id=$movie_id");
     exit;
 }

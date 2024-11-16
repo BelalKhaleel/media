@@ -9,9 +9,9 @@ if(isset($_POST['category']) && !empty(trim($_POST['category']))) {
   $stmt = $pdo->prepare($sql);
   $stmt->bindParam(':category', $category);
   $stmt->execute();
-  $_SESSION["add-category"] = true;
+  $_SESSION["add-category"] = TRUE;
   header("location:../categories.php");
 } else {
-  $_SESSION["add-category"] = false;
+  $_SESSION["add-category"] = FALSE;
   header("location:../categories.php");
 }

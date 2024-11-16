@@ -8,34 +8,39 @@ if (
   && isset($_POST['password']) 
   && !empty(trim($_POST['password']))
 ) {
-  $username1 = trim($_POST['username']);
-  $password1 = trim($_POST['password']);
-  $sql = "SELECT ClientID, Username, Password, is_admin FROM `clients` WHERE Username = :username AND Password = :password;";
+  $username = trim($_POST['username']);
+  $password = trim($_POST['password']);
+  $sql = "SELECT ClientID, Username, Password, is_admin FROM `clients` WHERE Username = :username;";
   $stmt = $pdo->prepare($sql);
-  $stmt->bindParam(':username', $username1);
-  $stmt->bindParam(':password', $password1);
+  $stmt->bindParam(':username', $username);
   $stmt->execute();
   $user_info = $stmt->fetch(PDO::FETCH_ASSOC);
   if (!$user_info) {
-    $_SESSION['login'] = false;
+    $_SESSION['login'] = FALSE;
     header("location:../login.php");
     exit();
-  } else {
-    $_SESSION['login'] = true;
+  }
+  if(password_verify($password, $user_info['Password'])) {
+    $_SESSION['credentials'] = TRUE;
+    $_SESSION['login'] = TRUE;
     $_SESSION['user_id'] = $user_info['ClientID'];
     $is_admin = $user_info['is_admin'];
     if ($is_admin) {
-      $_SESSION['admin'] = true;
+      $_SESSION['admin'] = TRUE;
       header("location:../admin/admin.php");
       exit();
     } else {
-      $_SESSION['admin'] = false;
+      $_SESSION['admin'] = FALSE;
       header("location:../index.php");
       exit();
     }
+  } else {
+    $_SESSION['login'] = FALSE;
+    header("location:../login.php");
+    exit();
   }
 } else {
-  $_SESSION['credentials'] = false;
+  $_SESSION['credentials'] = FALSE;
   header("location:../login.php");
   exit();
 }

@@ -1,6 +1,7 @@
 <?php
 session_start();
-if (isset($_SESSION['login']) || isset($_SESSION['registeration'])) {
+require_once('./connection.php');
+if (isset($_SESSION['login']) || isset($_SESSION['registration'])) {
   if ($_SESSION['admin']) {
     header("location:./admin/admin.php");
   } else {
@@ -19,7 +20,7 @@ if (isset($_SESSION['login']) || isset($_SESSION['registeration'])) {
   <title>Sign Up</title>
 </head>
 <body style="padding: 2em; display: flex; flex-direction: column; align-items: center; ">
-  <form action="./Auth/registeration.php" method="post" style="width: 30%; ">
+  <form action="./Auth/registration.php" method="post" style="width: 30%; ">
     <div class="mb-3">
       <label for="firstName" class="form-label">First Name:</label>
       <input type="text" class="form-control" id="firstName" name="firstName">
@@ -32,7 +33,6 @@ if (isset($_SESSION['login']) || isset($_SESSION['registeration'])) {
       <label for="gender">Gender:</label>
       <select name="gender" id="gender">
       <?php
-        require_once('./connection.php');
         $sql = "SELECT * FROM `genders`;";
         $stmt = $pdo->query($sql);
         $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -78,10 +78,11 @@ if (isset($_SESSION['login']) || isset($_SESSION['registeration'])) {
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
   <?php
-  if (isset($_SESSION['registeration']) && !$_SESSION['registeration']) {
+  if (isset($_SESSION['registration']) && !$_SESSION['registration']) {
     ?>
     <p style="color: red;">Please fill out the required fields</p>
     <?php
+    unset($_SESSION['registration']);
   }
   ?>
 </body>

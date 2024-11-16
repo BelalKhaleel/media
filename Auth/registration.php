@@ -1,9 +1,11 @@
 <?php
 
 session_start();
+require_once("../connection.php");
 
 if(
-  isset($_POST['firstName']) 
+  $_SERVER['REQUEST_METHOD'] === 'POST'
+  && isset($_POST['firstName']) 
   && !empty(trim($_POST['firstName']))
   && isset($_POST['lastName']) 
   && !empty(trim($_POST['lastName']))
@@ -30,10 +32,10 @@ if(
   $country = trim($_POST['country']);
   $username = trim($_POST['username']);
   $password = trim($_POST['password']);
+  $hash_password = password_hash($password, PASSWORD_BCRYPT);
 
   $sql = "INSERT INTO `clients` (`FName`, `LName`, `GenderID`, `Phone`, `Address`, `CountryID`, `Username`, `Password`) 
           VALUES (:firstName, :lastName, :genderId, :phone, :address, :countryId, :username, :password);";
-  require_once("../../../connection.php");
   $stmt = $pdo->prepare($sql);
   $stmt->execute([
     ':firstName' => $first_name, 
@@ -43,13 +45,13 @@ if(
     ':address' => $address,
     ':countryId' => $country,
     ':username' => $username,
-    ':password' => $password,
+    ':password' => $hash_password,
   ]);
   $_SESSION['registration'] = true;
-  header("location:../../../index.php");
+  header("location:../index.php");
   exit();
 } else {
   $_SESSION['registration'] = false;
-  header("location:../../../registration.php");
+  header("location:../registration.php");
   exit();
 }

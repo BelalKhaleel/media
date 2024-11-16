@@ -54,7 +54,7 @@ require_once('./connection.php');
 <body>
   <nav>
     <?php
-    if(isset($_SESSION['login'])) {
+    if((isset($_SESSION['login']) && $_SESSION['login']) || (isset($_SESSION['registration']) && $_SESSION['registration'])) {
       ?>
       <a href="./logout.php" class="logout">Logout</a>
       <?php
@@ -74,7 +74,7 @@ require_once('./connection.php');
       }
     } else {
     ?>
-    <a href="./registeration.php">Sign up</a>
+    <a href="./registration.php">Sign up</a>
     <p>Already a user?</p>
     <a href="./login.php">Login</a>
     <?php

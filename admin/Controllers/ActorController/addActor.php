@@ -44,11 +44,11 @@ if (
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':actor'=> $actor, ':gender'=> $gender, ':nationality'=> $nationality]);
     
-    $_SESSION['add-actor'] = true;
+    $_SESSION['add-actor'] = TRUE;
     header("location:../../actors.php");
     exit;
   } else {
-    $_SESSION['add-actor'] = false;
+    $_SESSION['add-actor'] = FALSE;
     header("location:../../actors.php");
     exit;
   }
