@@ -7,6 +7,8 @@ require_once('./connection.php');
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <title>Home</title>
   <style>
     *, 
@@ -26,7 +28,7 @@ require_once('./connection.php');
     nav a.logout {
       margin: 0 auto;
     }
-    main {
+    .container {
       display: flex;
     }
     aside {
@@ -42,8 +44,11 @@ require_once('./connection.php');
     aside a:hover {
       color: gold;
     }
+    main {
+      padding: 1em;
+    }
     section {
-      padding-left: 3em;
+      padding: 1em;
     }
     section img {
       width: 13em;
@@ -81,7 +86,7 @@ require_once('./connection.php');
     }
     ?>
   </nav>
-  <main>
+  <div class="container">
     <aside>
       <?php
       $sql = "SELECT * FROM `categories`";
@@ -98,39 +103,83 @@ require_once('./connection.php');
       }
       ?>
     </aside>
-    <section>
-      <?php
-      if (isset($_GET['category_id']) && !empty(trim($_GET['category_id'])) && is_numeric($_GET['category_id'])) {
-        $sql = "SELECT movies.MovieID, movies.Title, movies.image 
-                FROM `movies` 
-                JOIN moviecategories 
-                ON movies.MovieID = moviecategories.MovieID 
-                WHERE moviecategories.CategoryID = :categoryId;";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':categoryId', $_GET['category_id']);
-        $stmt->execute();
-        $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach($movies as $movie){
-          ?>
-          <a href="movie-details.php?movie_id=<?= $movie['MovieID'] ?>">
-            <img src="<?= $movie['image'] ?>" alt="<?= $movie['Title'] ?>">
-          </a>
-          <?php
-        } 
-      } else {
-        $sql = "SELECT MovieID, Title, image FROM `movies`";
-        $stmt = $pdo->query($sql);
-        $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach($movies as $movie){
-          ?>
-          <a href="movie-details.php?movie_id=<?= $movie['MovieID'] ?>">
-            <img src="<?= $movie['image'] ?>" alt="<?= $movie['Title'] ?>">
-          </a>
-          <?php
+    <main>
+      <section class="search-section">
+        <input type="text" id="search-input" placeholder="Enter movie name">
+        <button type="button" id="search-bar">Search Movie</button>
+        <div id="searched-movies"></div>
+      </section>
+      <section>
+        <?php
+        if (isset($_GET['category_id']) && !empty(trim($_GET['category_id'])) && is_numeric($_GET['category_id'])) {
+          $sql = "SELECT movies.MovieID, movies.Title, movies.image
+                  FROM `movies`
+                  JOIN moviecategories
+                  ON movies.MovieID = moviecategories.MovieID
+                  WHERE moviecategories.CategoryID = :categoryId;";
+          $stmt = $pdo->prepare($sql);
+          $stmt->bindParam(':categoryId', $_GET['category_id']);
+          $stmt->execute();
+          $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          foreach($movies as $movie){
+            ?>
+            <a href="movie-details.php?movie_id=<?= $movie['MovieID'] ?>">
+              <img src="<?= $movie['image'] ?>" alt="<?= $movie['Title'] ?>">
+            </a>
+            <?php
+          }
+        } else {
+          $sql = "SELECT MovieID, Title, image FROM `movies`";
+          $stmt = $pdo->query($sql);
+          $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          foreach($movies as $movie){
+            ?>
+            <a href="movie-details.php?movie_id=<?= $movie['MovieID'] ?>">
+              <img src="<?= $movie['image'] ?>" alt="<?= $movie['Title'] ?>">
+            </a>
+            <?php
+          }
         }
+        ?>
+      </section>
+    </main>
+  </div>
+  <script>
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-bar');
+    function getMovieData(result) {
+      let searchedMovies = document.getElementById('searched-movies');
+      searchedMovies.innerHTML = "";
+      if(result.success) {
+        const movieInfo = result.movies;
+        movieInfo.forEach(movie => {
+          const a = document.createElement('a');
+          a.href = `./movie-details.php?movie_id=${movie.MovieID}`;
+          a.textContent = movie.Title;
+          a.style.display = 'block';
+          searchedMovies.appendChild(a);
+        });
+        
+      } else {
+        console.log('No movie with such title');
       }
-      ?>
-    </section>
-  </main>
+    }
+    searchInput.addEventListener('keyup', () => {
+      let search = searchInput.value;
+
+      const urlencoded = new URLSearchParams();
+      urlencoded.append("search", search);
+
+      const requestOptions = {
+        method: "POST", 
+        body: urlencoded,
+      }
+
+      fetch('http://localhost/media/search.php', requestOptions)
+        .then(response => response.json())
+        .then(result => getMovieData(result))
+        .catch(error => console.error(error));
+    });
+  </script>
 </body>
 </html>

@@ -2,7 +2,8 @@
 
 $server = "localhost";
 $db = "media";
-$dsn = "mysql:host=$server;dbname=$db";
+$port = 3307 ?? 3306;
+$dsn = "mysql:host=$server;port=$port;dbname=$db";
 $db_username = "root";
 $db_password = "";
 
