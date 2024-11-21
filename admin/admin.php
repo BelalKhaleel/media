@@ -12,6 +12,7 @@ require_once('./check-admin.php');
 </head>
 <body style="padding:1em;">
   <h1>Admin Dashboard</h1>
+  <a href="../index.php">Home</a>
   <a href="clients.php">clients</a>
   <a href="categories.php">categories</a>
   <a href="actors.php">actors</a>

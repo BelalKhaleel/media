@@ -1,9 +1,10 @@
 <?php
 session_start();
 require_once('./connection.php');
-print_r($_POST);
+
 if(
-  isset($_POST['user_id'])
+  $_SERVER['REQUEST_METHOD'] === 'POST'
+  && isset($_POST['user_id'])
   && !empty(trim($_POST['user_id']))
   && is_numeric($_POST['user_id'])
   && isset($_POST['movie_id'])
@@ -69,6 +70,9 @@ if(
     exit;
   } else {
     $_SESSION['add-to-cart'] = FALSE;
+    if(empty(trim($_POST['quantity']))) {
+      die('Please add the number of items required');
+    }
     header("location:./movie-details.php?movie_id=$movie_id");
     exit;
 }

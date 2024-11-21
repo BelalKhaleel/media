@@ -97,6 +97,7 @@ require_once('./connection.php');
     }
     unset($_SESSION['add-to-cart']);
   ?>
+  <a href="./cart.php">View cart</a>
   <a href="./index.php">Go back to movies</a>
 </body>
 </html>
