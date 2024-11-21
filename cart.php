@@ -25,6 +25,15 @@ if(!$orders) {
   <?php
   die();
 }
+$query = "SELECT ROUND(SUM(saledetail.Qty * movies.UnitPrice), 2) AS 'total_price' 
+          FROM saledetail JOIN movies ON movies.MovieID = saledetail.MovieID 
+          JOIN sales ON sales.SaleID = sales.SaleID 
+          WHERE saledetail.SaleID = :saleID;";
+$stmt = $pdo->prepare($query);
+$stmt->bindParam(':saleID', $orders[0]['SaleID']);
+$stmt->execute();
+$total_price = $stmt->fetch();
+$total_price = $total_price['total_price'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' 
     && isset($_POST['method']) 
     && $_POST['method'] === 'patch'
@@ -67,7 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
     && is_numeric($_POST['sale-id'])
     ) {
   $sale_id = filter_var(trim($_POST['sale-id']), FILTER_VALIDATE_INT);
-  $_SESSION['sale-id'] = $sale_id;
+  if(!isset($_SESSION['sale-id'])) {
+    $_SESSION['sale-id'] = $sale_id;
+  }
   $sql = "DELETE FROM saledetail WHERE saledetail.ID = :saleId;";
   $stmt = $pdo->prepare($sql);
   $stmt->bindParam(':saleId', $sale_id, PDO::PARAM_INT);
@@ -109,9 +120,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
   <h1>Order:</h1>
   <table class="table table-striped">
     <thead>
-      <th>Movie</th>
-      <th>Quantity</th>
-      <th>Actions</th>
+      <tr>
+        <th scope="col">Movie</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Price</th>
+        <th scope="col">Actions</th>
+      </tr>
     </thead>
     <tbody>
       <?php
@@ -120,6 +134,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
         <tr>
           <td><?= $order['Title'] ?></td>
           <td><?= $order['Qty'] ?></td>
+          <?php
+          $query = "SELECT saledetail.Qty * movies.UnitPrice AS 'price' 
+                    FROM saledetail 
+                    JOIN movies ON movies.MovieID = saledetail.MovieID 
+                    WHERE saledetail.ID = :orderId;";
+          $stmt = $pdo->prepare($query);
+          $stmt->bindParam(':orderId', $order['ID'], PDO::PARAM_INT);
+          $stmt->execute();
+          $price = $stmt->fetch();
+          $price = $price['price'];
+          ?>
+          <td><?= $price ?></td>
           <td style="display:flex; gap: 10px;">
             <form action="" method="post">
               <input type="hidden" name="method" value="patch">
@@ -138,6 +164,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
       }
       ?>
     </tbody>
+    <tfoot>
+      <tr>
+        <th scope="row">Total Price:</th>
+        <td><?= $total_price ?></td>
+      </tr>
+    </tfoot>
   </table>
   <form action="" method="post">
     <input type="hidden" name="method" value="delete-all">

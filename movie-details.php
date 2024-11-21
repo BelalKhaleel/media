@@ -79,7 +79,7 @@ require_once('./connection.php');
         $max_quantity = $max_quantity['Quantity'];
         ?>
         <label for="quantity">Please enter the number of items</label>
-        <input type="number" id="quantity" name="quantity" min="1" max="<?= $max_quantity ?>" >
+        <input type="number" id="quantity" name="quantity" min="1" max="<?= $max_quantity ?>" value="1">
         <button type="submit">Add to cart</button>
       </fieldset>
     </form>
