@@ -3,7 +3,8 @@ session_start();
 require_once("../connection.php");
 
 if (
-  isset($_POST['username']) 
+  $_SERVER['REQUEST_METHOD'] === 'POST'
+  && isset($_POST['username'])
   && !empty(trim($_POST['username']))
   && isset($_POST['password']) 
   && !empty(trim($_POST['password']))
@@ -25,6 +26,9 @@ if (
     $_SESSION['login'] = TRUE;
     $_SESSION['user_id'] = $user_info['ClientID'];
     $is_admin = $user_info['is_admin'];
+    if (isset($_POST['keep-me'])) {
+      setcookie("user", $user_info['ClientID'], time()+60*60*24*30, "/");
+    }
     if ($is_admin) {
       $_SESSION['admin'] = TRUE;
       header("location:../admin/admin.php");

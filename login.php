@@ -30,6 +30,10 @@ if (isset($_SESSION['login']) || isset($_SESSION['registration'])) {
       <label for="password" class="form-label">Password:</label>
       <input type="password" class="form-control" id="password" name="password" >
     </div>
+    <div class="mb-3">
+      <input type="checkbox" id="keep-me" name="keep-me" >
+      <label for="keep-me" class="form-label">Keep me logged in</label>
+    </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
   <?php

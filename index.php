@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once('./connection.php');
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,7 +60,11 @@ require_once('./connection.php');
 <body>
   <nav>
     <?php
-    if((isset($_SESSION['login']) && $_SESSION['login']) || (isset($_SESSION['registration']) && $_SESSION['registration'])) {
+    if(
+      (isset($_SESSION['login']) && $_SESSION['login'])
+      || (isset($_SESSION['registration']) && $_SESSION['registration'])
+      || isset($_COOKIE['user'])
+      ) {
       ?>
       <a href="./logout.php" class="logout">Logout</a>
       <?php
