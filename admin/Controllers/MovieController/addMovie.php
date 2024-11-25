@@ -109,6 +109,8 @@ if (
     ]);
   }
 
+  header("Location:../../movies.php");
+  exit;
 } else {
   die("Error: movie not added. Please check the input values and try again." . PHP_EOL);
 }

@@ -38,7 +38,8 @@ require_once('./check-admin.php');
                    movies.Title, 
                    movies.ProduceYear, 
                    movies.UnitPrice, 
-                   movies.Quantity, 
+                   movies.Quantity,
+                   movies.image,
                    directors.DirectorName,
                    GROUP_CONCAT(DISTINCT actors.ActorName SEPARATOR ', ') AS Actors,
                    GROUP_CONCAT(DISTINCT categories.CategoryName SEPARATOR ', ') AS Categories
@@ -55,26 +56,27 @@ require_once('./check-admin.php');
     $stmt->execute();
     $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
   } else {
-  $sql = "SELECT movies.MovieID,
-                 movies.Title,
-                 movies.ProduceYear,
-                 movies.UnitPrice,
-                 movies.Quantity,
-                 directors.DirectorName,
-                 GROUP_CONCAT(DISTINCT actors.ActorName SEPARATOR ', ') AS Actors,
-                 GROUP_CONCAT(DISTINCT categories.CategoryName SEPARATOR ', ') AS Categories
-          FROM movies
-          JOIN directors ON movies.DirectorID = directors.DirectorID
-          JOIN movieactors ON movieactors.MovieID = movies.MovieID
-          JOIN actors ON movieactors.ActorID = actors.ActorID
-          JOIN moviecategories ON moviecategories.MovieID = movies.MovieID
-          JOIN categories ON moviecategories.CategoryID = categories.CategoryID
-          GROUP BY movies.MovieID
-          LIMIT :limit, $movies_per_page;";
-  $stmt = $pdo->prepare($sql);
-  $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-  $stmt->execute();
-  $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sql = "SELECT movies.MovieID,
+                  movies.Title,
+                  movies.ProduceYear,
+                  movies.UnitPrice,
+                  movies.Quantity,
+                  movies.image,
+                  directors.DirectorName,
+                  GROUP_CONCAT(DISTINCT actors.ActorName SEPARATOR ', ') AS Actors,
+                  GROUP_CONCAT(DISTINCT categories.CategoryName SEPARATOR ', ') AS Categories
+            FROM movies
+            JOIN directors ON movies.DirectorID = directors.DirectorID
+            JOIN movieactors ON movieactors.MovieID = movies.MovieID
+            JOIN actors ON movieactors.ActorID = actors.ActorID
+            JOIN moviecategories ON moviecategories.MovieID = movies.MovieID
+            JOIN categories ON moviecategories.CategoryID = categories.CategoryID
+            GROUP BY movies.MovieID
+            LIMIT :limit, $movies_per_page;";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    $movies = $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
   if (!$movies) {
     echo "No movies found";
@@ -90,6 +92,8 @@ require_once('./check-admin.php');
       <th>Director</th>
       <th>Actors</th>
       <th>Categories</th>
+      <th>Image</th>
+      <th>Update Movie</th>
     </thead>
     <tbody>
       <?php
@@ -104,6 +108,22 @@ require_once('./check-admin.php');
           <td><?= $movie['DirectorName'] ?></td>
           <td><?= $movie['Actors'] ?></td>
           <td><?= $movie['Categories'] ?></td>
+          <td><img src="../<?= $movie['image'] ?>" alt="movie image" style="width:50px; height:60px;"></td>
+          <td>
+            <form action="./edit-movie.php" method="post">
+                <input type="hidden" name="id" value="<?= $movie['MovieID'] ?>">
+                <input type="hidden" name="movie-title" value="<?= $movie['Title'] ?>">
+                <input type="hidden" name="production-year" value="<?= $movie['ProduceYear'] ?>">
+                <input type="hidden" name="unit-price" value="<?= $movie['UnitPrice'] ?>">
+                <input type="hidden" name="quantity" value="<?= $movie['Quantity'] ?>">
+                <input type="hidden" name="director-name" value="<?= $movie['DirectorName'] ?>">
+                <input type="hidden" name="actors" value="<?= $movie['Actors'] ?>">
+                <input type="hidden" name="categories" value="<?= $movie['Categories'] ?>">
+                <input type="hidden" name="image" value="<?= $movie['image'] ?>">
+                <input type="hidden" name="page" value="<?= $_GET['page'] ?? 1 ?>">
+                <button type="submit" class="btn btn-primary">EDIT</button>
+              </form>
+          </td>
         </tr>
         <?php
       }

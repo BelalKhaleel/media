@@ -1,9 +1,11 @@
 <?php
 session_start();
 require_once('./check-admin.php');
+require_once('../connection.php');
 
 if (
-      isset($_POST['id']) 
+  $_SERVER['REQUEST_METHOD'] === 'POST'
+  && isset($_POST['id']) 
   && !empty($_POST['id']) 
   && is_numeric($_POST['id'])
   && isset($_POST['name'])
@@ -36,7 +38,6 @@ if (
         <label for="gender">Gender:</label>
         <select name="gender" id="gender">
         <?php
-          require_once('../connection.php');
           $sql = "SELECT * FROM `genders`;";
           $stmt = $pdo->query($sql);
           $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
